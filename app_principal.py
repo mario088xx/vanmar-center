@@ -1,142 +1,127 @@
 import streamlit as st
 
-# 1. CONFIGURACIÓN DE PÁGINA
+# 1. CONFIGURACIÓN
 st.set_page_config(page_title="VANMAR PRO", page_icon="🚗", layout="centered")
 
-# 2. DISEÑO PROFESIONAL CON BACKGROUND DE AUTOS
+# 2. CSS PROFESIONAL (Glassmorphism & Oxford)
 st.markdown("""
     <style>
     header {visibility: hidden;} footer {visibility: hidden;}
-    
-    /* Fondo con patrón sutil de autos */
     .stApp {
-        background-color: #121212;
-        background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+        background-color: #0F172A; /* Oxford Blue Profundo */
+        background-image: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
     }
 
-    .main-box { 
-        max-width: 400px; margin: auto; text-align: center; 
-        padding: 30px; color: #FFFFFF;
-        background: rgba(30, 30, 30, 0.9);
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    /* Tarjeta Principal con Transparencia */
+    .main-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 40px 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        max-width: 400px;
+        margin: auto;
     }
 
-    .logo-circle {
-        width: 80px; height: 80px; border: 2px solid #4285F4; border-radius: 50%;
-        margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
-        background-color: #FFFFFF; font-size: 40px;
+    /* Icono de Auto Premium */
+    .premium-logo {
+        font-size: 50px;
+        margin-bottom: 10px;
+        filter: drop-shadow(0 0 10px #4285F4);
     }
 
-    .title-text { font-size: 28px; font-weight: 800; color: #FFFFFF; }
-    .pro-text { color: #4285F4; }
-    .welcome-msg { font-size: 16px; color: #BBB; margin-bottom: 25px; }
+    .title-text { font-size: 28px; font-weight: 800; color: white; margin-bottom: 5px; }
+    .pro-tag { color: #4285F4; }
+    .tagline { color: #94A3B8; font-size: 14px; margin-bottom: 30px; }
 
-    /* Botones Limpios */
+    /* Fila de Iconos que se habían perdido */
+    .status-row { display: flex; justify-content: space-around; margin-bottom: 35px; }
+    .status-unit { text-align: center; color: #94A3B8; font-size: 11px; }
+    .circle-icon { 
+        width: 45px; height: 45px; border-radius: 50%; 
+        background: rgba(66, 133, 244, 0.1); border: 1px solid rgba(66, 133, 244, 0.3);
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 20px; margin: 0 auto 8px; color: white;
+    }
+
+    /* Botones Estilo Google Original */
     .stButton>button {
-        width: 100%; border-radius: 10px; height: 50px; font-weight: 600;
-        border: none; cursor: pointer;
+        width: 100%; border-radius: 10px; height: 50px; font-weight: 600; border: none;
     }
-    .btn-google button { background-color: #FFFFFF !important; color: #444 !important; border: 1px solid #ddd !important; }
-    .btn-main button { background-color: #4285F4 !important; color: white !important; }
+    .google-btn button { 
+        background-color: white !important; color: #1F2937 !important; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .login-btn button { background-color: #4285F4 !important; color: white !important; margin-top: 10px; }
 
-    /* Estilo de inputs */
+    /* Inputs */
     .stTextInput>div>div>input {
-        background-color: #252525 !important; color: white !important;
-        border: 1px solid #444 !important; border-radius: 8px !important;
+        background-color: rgba(0,0,0,0.2) !important; color: white !important;
+        border: 1px solid #334155 !important; border-radius: 10px !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# GESTIÓN DE PASOS
+# NAVEGACIÓN
 if 'step' not in st.session_state: st.session_state.step = 'login'
 
-# --- PANTALLA 1: LOGIN (ESTILO GOOGLE/GMAIL) ---
+# --- PANTALLA 1: LOGIN (CALCADO PROFESIONAL) ---
 if st.session_state.step == 'login':
-    st.markdown('<div class="main-box">', unsafe_allow_html=True)
-    st.markdown('<div class="logo-circle">🚗</div>', unsafe_allow_html=True) # Icono de auto
-    st.markdown('<div class="title-text">VANMAR <span class="pro-text">PRO</span></div>', unsafe_allow_html=True)
-    st.markdown('<div class="welcome-msg">Gestión de Trámites Vehiculares Profesional</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-card">', unsafe_allow_html=True)
+    st.markdown('<div class="premium-logo">🏎️</div>', unsafe_allow_html=True) # Icono estilizado
+    st.markdown('<div class="title-text">VANMAR <span class="pro-tag">PRO</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="tagline">Gestión de Trámites Vehiculares Profesional</div>', unsafe_allow_html=True)
 
-    # Botón Google (Acceso Directo)
-    st.markdown('<div class="btn-google">', unsafe_allow_html=True)
+    # LOS ICONOS QUE SE PERDÍAN
+    st.markdown("""
+        <div class="status-row">
+            <div class="status-unit"><div class="circle-icon">🚗</div>Trámites</div>
+            <div class="status-unit"><div class="circle-icon">📄</div>Documentos</div>
+            <div class="status-unit"><div class="circle-icon">✅</div>Control</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="google-btn">', unsafe_allow_html=True)
     if st.button("Continuar con Google 🌐"):
-        # En la versión final, aquí se conecta con el selector de cuentas de Google
-        st.session_state.user = "Usuario Google"
+        # AQUÍ ES DONDE SE CONECTARÁ EL POP-UP REAL
         st.session_state.step = 'wa_config'
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.write("o")
+    st.markdown("<p style='color:#64748B; margin:15px 0;'>— o ingresa manualmente —</p>", unsafe_allow_html=True)
 
-    # Registro Manual
-    email = st.text_input("Correo electrónico")
+    email = st.text_input("Correo electrónico", placeholder="ejemplo@gmail.com")
     password = st.text_input("Contraseña", type="password")
 
-    st.markdown('<div class="btn-main" style="margin-top:10px;">', unsafe_allow_html=True)
+    st.markdown('<div class="login-btn">', unsafe_allow_html=True)
     if st.button("Iniciar Sesión"):
         if email and password:
-            st.session_state.user = email
             st.session_state.step = 'wa_config'
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown("<p style='font-size:12px; margin-top:15px; color:#4285F4;'>¿No tienes cuenta? Regístrate aquí</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:12px; margin-top:20px; color:#4285F4;'>¿Eres nuevo? <b>Regístrate aquí</b></p>", unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- PANTALLA 2: WHATSAPP (EL POR QUÉ) ---
+# --- PANTALLA 2: WHATSAPP (POST-LOGIN) ---
 elif st.session_state.step == 'wa_config':
-    st.markdown('<div class="main-box">', unsafe_allow_html=True)
-    st.markdown("### 📲 Enlace de Notificaciones")
-    st.write("Para enviarte las alertas de tus citas y reportes de aliados como Bigotes, vincula tu número de trabajo.")
-    
-    cel = st.text_input("WhatsApp (10 dígitos)", placeholder="5512345678")
-    
-    st.markdown('<div class="btn-main">', unsafe_allow_html=True)
-    if st.button("Activar y Continuar"):
+    st.markdown('<div class="main-card">', unsafe_allow_html=True)
+    st.markdown("### 📲 Casi listo")
+    st.write("Vincula tu número de WhatsApp para recibir alertas de tus aliados (como **Bigotes**) y el estatus de tus trámites.")
+    cel = st.text_input("WhatsApp a 10 dígitos")
+    if st.button("Activar Sistema"):
         if len(cel) == 10:
-            st.session_state.wa = cel
             st.session_state.step = 'menu'
             st.rerun()
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# --- PANTALLA 3: MENÚ (TUS ALIADOS) ---
+# --- SIGUIENTE FLUJO ---
 elif st.session_state.step == 'menu':
-    st.markdown(f"### 🚀 ¿Qué haremos hoy?")
-    st.write(f"Sesión activa: {st.session_state.wa}")
-    
+    st.title("🚀 Panel Operativo")
+    st.write("Bienvenido al centro de mando.")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("TRÁMITE PROPIO"):
-            st.session_state.origen = "PROPIO"
-            st.session_state.step = 'carga'
-            st.rerun()
+        if st.button("TRÁMITE PROPIO"): st.info("Abriendo carga...")
     with col2:
-        if st.button("ALIADOS"):
-            st.session_state.origen = "ALIADOS"
-            st.session_state.step = 'carga'
-            st.rerun()
-
-# --- PANTALLA 4: CARGA Y FRASE FINAL ---
-elif st.session_state.step == 'carga':
-    st.subheader(f"Registro: {st.session_state.origen}")
-    if st.session_state.origen == "ALIADOS":
-        aliado = st.selectbox("¿De quién es el trámite?", ["Bigotes", "Liz", "Emilio", "Otros"])
-    
-    st.file_uploader("Subir Cita (Documento Maestro)")
-    
-    if st.button("Finalizar"):
-        st.success("Trámite guardado.")
-        # REGRESA LA FRASE MOTIVACIONAL
-        st.markdown("""
-        ---
-        ### 🙏 ¡Éxito en tu camino!
-        Recuerda:
-        * ⛽ Gasolina revisada.
-        * 🎗️ Cinturón puesto.
-        * 🍎 Desayuno listo.
-        * **Agradece a Dios por este nuevo día.**
-        """)
-        if st.button("Nuevo Registro"):
-            st.session_state.step = 'menu'
-            st.rerun()
+        if st.button("ALIADOS"): st.info("Seleccionando aliado...")
