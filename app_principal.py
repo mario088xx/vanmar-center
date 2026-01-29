@@ -6,129 +6,133 @@ import urllib.parse
 # CONFIGURACIÓN DE PÁGINA ESTILO APPLE
 st.set_page_config(page_title="VANMAR PRO", page_icon="💎", layout="centered")
 
-# ESTILOS PERSONALIZADOS
+# ESTILOS PERSONALIZADOS PARA EL LOGIN PROFESIONAL
 st.markdown("""
     <style>
-    .stButton>button { width: 100%; border-radius: 20px; height: 3em; background-color: #007AFF; color: white; }
-    .stTextInput>div>div>input { border-radius: 10px; }
-    .status-box { padding: 20px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 20px; }
+    .stButton>button { width: 100%; border-radius: 12px; height: 3.5em; background-color: #007AFF; color: white; border: none; font-weight: bold; }
+    .stTextInput>div>div>input { border-radius: 8px; border: 1px solid #ddd; padding: 12px; }
+    .main-title { text-align: center; color: #1d1d1f; font-size: 28px; font-weight: 700; margin-bottom: 5px; }
+    .sub-title { text-align: center; color: #86868b; font-size: 16px; margin-bottom: 30px; }
+    .icon-container { display: flex; justify-content: space-around; text-align: center; margin-bottom: 30px; }
+    .icon-box { font-size: 40px; }
+    .icon-label { font-size: 12px; color: #1d1d1f; margin-top: 5px; }
+    hr { margin: 25px 0; border: 0; border-top: 1px solid #eee; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- LÓGICA DE ESTADO ---
+# --- ESTADOS DE SESIÓN ---
 if 'step' not in st.session_state:
     st.session_state.step = 'login'
 if 'user_wa' not in st.session_state:
     st.session_state.user_wa = ""
 
-# --- FUNCIONES DE APOYO ---
+# --- FUNCIÓN WHATSAPP ---
 def send_wa(num, msg):
-    text = urllib.parse.quote(msg)
-    return f"https://wa.me/{num}?text={text}"
+    return f"https://wa.me/{num}?text={urllib.parse.quote(msg)}"
 
-# --- 1. LOGIN & WHATSAPP CONFIG ---
+# --- 1. PANTALLA DE LOGIN (REDiseñada) ---
 if st.session_state.step == 'login':
-    st.title("💎 Sign in to continue")
-    st.subheader("VANMAR PRO | Gestión Vehicular")
+    # Encabezado Visual
+    st.markdown('<p class="main-title">VANMAR PRO</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-title">Bienvenido a tu gestión vehicular profesional.<br>Registrate para continuar.</p>', unsafe_allow_html=True)
     
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+    # Fila de Iconos (Carro, Doc, OK)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown('<div style="text-align:center"><span style="font-size:40px;">🚗</span><br><span style="font-size:12px;">Trámites</span></div>', unsafe_allow_html=True)
+    with col2:
+        st.markdown('<div style="text-align:center"><span style="font-size:40px;">📄</span><br><span style="font-size:12px;">Documentos</span></div>', unsafe_allow_html=True)
+    with col3:
+        st.markdown('<div style="text-align:center"><span style="font-size:40px;">✅</span><br><span style="font-size:12px;">Control</span></div>', unsafe_allow_html=True)
     
-    if st.button("Sign in"):
+    st.write("") # Espaciador
+    
+    # Botón Google
+    if st.button("Continue with Google 🌐"):
         st.session_state.step = 'wa_config'
         st.rerun()
-
-elif st.session_state.step == 'wa_config':
-    st.title("📲 Configuración de Notificaciones")
-    st.info("Registra tu WhatsApp de trabajo para recibir alertas y control de citas.")
-    wa_num = st.text_input("Número de WhatsApp (10 dígitos)", placeholder="Ej: 5512345678")
+        
+    st.markdown('<p style="text-align:center; color:#86868b;">— o —</p>', unsafe_allow_html=True)
     
-    if st.button("Confirmar y Continuar"):
-        if len(wa_num) == 10:
-            st.session_state.user_wa = "52" + wa_num
+    # Formulario Email
+    email = st.text_input("Email", placeholder="tu@ejemplo.com")
+    password = st.text_input("Password", type="password", placeholder="••••••••")
+    
+    if st.button("Sign in"):
+        if email and password:
+            st.session_state.step = 'wa_config'
+            st.rerun()
+        else:
+            st.error("Por favor completa los campos")
+
+    st.markdown('<p style="text-align:center; font-size:14px;"><a href="#">Forgot password?</a></p>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align:center; font-size:14px; margin-top:10px;">Need an account? <a href="#">Sign up</a></p>', unsafe_allow_html=True)
+
+# --- 2. REGISTRO DE WHATSAPP ---
+elif st.session_state.step == 'wa_config':
+    st.markdown("### 📲 Configura tu WhatsApp")
+    st.write("Necesitamos tu número para enviarte notificaciones de tus trámites.")
+    num = st.text_input("Número de 10 dígitos", placeholder="5512345678")
+    
+    if st.button("Confirmar Número"):
+        if len(num) == 10:
+            st.session_state.user_wa = "52" + num
             st.session_state.step = 'main'
             st.rerun()
         else:
-            st.error("Por favor ingresa un número válido.")
+            st.error("Ingresa un número válido")
 
-# --- 2. PANTALLA PRINCIPAL (CARGA DE CITA) ---
+# --- 3. FLUJO DE TRABAJO (PROPIO/ALIADOS) ---
 elif st.session_state.step == 'main':
-    st.title("🚀 Iniciar Nuevo Trámite")
+    st.title("🚀 Nuevo Trámite")
+    st.write("### 1. Sube tu Cita")
+    cita = st.file_uploader("Arrastra aquí el documento", type=['pdf', 'jpg', 'png'])
     
-    # DISPARADOR: CARGA DE CITA
-    st.write("### 1. Sube la Cita para iniciar")
-    cita_file = st.file_uploader("Arrastra aquí el documento de la Cita", type=['pdf', 'jpg', 'png'])
-    
-    if cita_file:
-        st.success("Cita cargada correctamente.")
-        
-        st.write("### 2. ¿Quién solicita el trámite?")
+    if cita:
+        st.success("Cita detectada.")
         col1, col2 = st.columns(2)
-        
         with col1:
             if st.button("PROPIO"):
-                st.session_state.tipo_solicitante = "PROPIO"
-                st.session_state.step = 'upload_docs'
+                st.session_state.tipo = "PROPIO"
+                st.session_state.step = 'upload'
                 st.rerun()
-        
         with col2:
             if st.button("ALIADOS"):
-                st.session_state.tipo_solicitante = "ALIADOS"
-                st.session_state.step = 'upload_docs'
+                st.session_state.tipo = "ALIADOS"
+                st.session_state.step = 'upload'
                 st.rerun()
 
-# --- 3. CARGA DE DOCUMENTOS Y VALIDACIÓN ---
-elif st.session_state.step == 'upload_docs':
-    st.title(f"📂 Expediente: {st.session_state.tipo_solicitante}")
+# --- 4. EXPEDIENTE Y VALIDACIÓN ---
+elif st.session_state.step == 'upload':
+    st.title(f"📂 Expediente {st.session_state.tipo}")
     
-    aliado_nombre = ""
-    if st.session_state.tipo_solicitante == "ALIADOS":
-        aliados_list = ["BIGOTES", "LIZ", "EMILIO", "PASCUAL", "ADRI", "ALONZO", "RAQUEL", "ALBERTO", "TOCAYO ISRA", "VICTOR", "FELIX", "GEMELO", "OTRO (Manual)"]
-        aliado_nombre = st.selectbox("¿De qué gestoría es este trámite?", aliados_list)
-        if aliado_nombre == "OTRO (Manual)":
-            aliado_nombre = st.text_input("Nombre de la gestoría")
+    aliado = ""
+    if st.session_state.tipo == "ALIADOS":
+        aliados = ["BIGOTES", "LIZ", "EMILIO", "PASCUAL", "ADRI", "ALONZO", "RAQUEL", "ALBERTO", "TOCAYO ISRA", "VICTOR", "FELIX", "GEMELO", "OTRO"]
+        aliado = st.selectbox("Selecciona al Aliado:", aliados)
 
-    st.write("### Carga de documentos requeridos")
-    solicitud = st.file_uploader("Solicitud de trámite")
-    pago = st.file_uploader("Recibo de Pago")
-    ine = st.file_uploader("INE / ID Oficial")
-    denuncia = st.checkbox("¿Perdió placas? (Subir Baja/Denuncia)")
-    denuncia_file = None
-    if denuncia:
-        denuncia_file = st.file_uploader("Constancia de denuncia")
-        
-    poder = None
-    if st.session_state.tipo_solicitante == "ALIADOS":
-        poder = st.file_uploader("Poder Notarial (Solo empresas)")
-
-    # ESTRATEGIA PROACTIVA: DETECCIÓN DE FALTANTES
-    if st.button("Validar Expediente"):
-        faltantes = []
-        if not solicitud: faltantes.append("Solicitud")
-        if not pago: faltantes.append("Pago")
-        if not ine: faltantes.append("INE")
-        
-        if faltantes:
-            st.error(f"Faltan documentos: {', '.join(faltantes)}")
-            if st.session_state.tipo_solicitante == "ALIADOS":
-                st.warning(f"¿Quieres que le avise a {aliado_nombre} por ti?")
-                msg_aliado = f"Hola {aliado_nombre}, detectamos que falta: {', '.join(faltantes)} para el trámite. Favor de enviarlo. \n\nMensaje enviado desde VANMAR PRO 💎"
-                st.markdown(f"[📲 Avisar a {aliado_nombre} por WhatsApp]({send_wa('52', msg_aliado)})")
+    # Simulación de carga
+    solicitud = st.file_uploader("Solicitud")
+    pago = st.file_uploader("Comprobante de Pago")
+    ine = st.file_uploader("Identificación (INE)")
+    
+    if st.button("Validar y Finalizar"):
+        if not ine or not pago:
+            st.error("Faltan documentos críticos.")
+            if st.session_state.tipo == "ALIADOS":
+                st.warning(f"¿Quieres que le avise a {aliado}?")
+                msg = f"Oye {aliado}, falta documento de este trámite. Enviado desde VANMAR PRO."
+                st.markdown(f"[📲 Avisar a {aliado} por WhatsApp]({send_wa('525500000000', msg)})")
         else:
-            st.success("¡Expediente Completo!")
             st.session_state.step = 'final'
             st.rerun()
 
-# --- 4. ASIGNACIÓN Y CIERRE ---
+# --- 5. ASIGNACIÓN FINAL ---
 elif st.session_state.step == 'final':
-    st.title("✅ Asignación de Trámite")
-    responsable = st.radio("¿Quién concluye este trámite?", ["VAN", "MAR", "OTRO"])
+    st.title("✅ Asignación")
+    resp = st.radio("¿Quién concluye?", ["VAN", "MAR", "OTRO"])
     
-    if st.button("Finalizar y Notificar"):
-        # MENSAJE DE LAS 7 AM / RESUMEN (SIMULADO PARA WHATSAPP)
-        msg_resumen = f"✅ NUEVO TRÁMITE ASIGNADO A {responsable}\n\nNo olvides revisar gasolina, cinturón y agradecer a Dios. ¡Mucho éxito hoy! 🚀\n\nMensaje enviado desde VANMAR PRO"
-        st.markdown(f"[📲 Enviar Resumen a mi WhatsApp]({send_wa(st.session_state.user_wa, msg_resumen)})")
+    if st.button("Terminar y Notificar"):
+        mensaje = f"¡Buenos días! Tienes trámites con {resp}. No olvides gasolina, cinturón y agradecer a Dios. ¡Éxito! - VANMAR PRO"
+        st.markdown(f"[📲 Enviar Resumen a WhatsApp]({send_wa(st.session_state.user_wa, mensaje)})")
         st.balloons()
-        if st.button("Registrar otro trámite"):
-            st.session_state.step = 'main'
-            st.rerun()
