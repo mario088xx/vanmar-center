@@ -1,113 +1,71 @@
 import streamlit as st
-import urllib.parse
+import pandas as pd
+from datetime import datetime
 
-# CONFIGURACIÓN PARA OCULTAR MENÚS DE STREAMLIT Y FORZAR DISEÑO
-st.set_page_config(page_title="VANMAR PRO", page_icon="💎", layout="centered")
+# Configuración Pro
+st.set_page_config(page_title="VANMAR PRO Dashboard", layout="wide")
 
+# ESTILOS CSS PARA DASHBOARD LIMPIO
 st.markdown("""
     <style>
-    /* Forzar fondo claro y ocultar basura de Streamlit */
-    .stApp { background-color: #F5F5F7; }
-    header {visibility: hidden;}
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    
-    /* Contenedor Principal tipo Tarjeta Apple */
-    .login-card {
-        background-color: white;
-        padding: 40px 30px;
-        border-radius: 28px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        text-align: center;
-        max-width: 400px;
-        margin: auto;
+    .kpi-card {
+        background-color: white; padding: 20px; border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;
+        border-top: 5px solid #007AFF;
     }
-    
-    .logo-text { font-size: 32px; font-weight: 800; color: #1d1d1f; margin-bottom: 5px; }
-    .logo-pro { color: #007AFF; }
-    .welcome-text { font-size: 22px; font-weight: 600; color: #1d1d1f; line-height: 1.2; }
-    .subtitle { color: #86868b; font-size: 14px; margin-bottom: 30px; }
-    
-    /* Fila de Iconos */
-    .icon-row {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 40px;
-    }
-    .icon-item { text-align: center; }
-    .icon-emoji { font-size: 30px; margin-bottom: 5px; }
-    .icon-text { font-size: 11px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; }
-
-    /* Botones Estilizados */
-    .stButton>button {
-        border-radius: 14px;
-        height: 52px;
-        font-weight: 600;
-        font-size: 16px;
-        border: none;
-    }
-    .google-btn button {
-        background-color: #007AFF !important;
-        color: white !important;
-    }
-    .sign-in-btn button {
-        background-color: #007AFF !important;
-        color: white !important;
+    .kpi-value { font-size: 24px; font-weight: bold; color: #1d1d1f; }
+    .kpi-label { font-size: 14px; color: #86868b; }
+    .tramite-card {
+        background-color: #f9f9fb; padding: 15px; border-radius: 12px;
+        margin-bottom: 10px; border-left: 8px solid #34C759;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- INICIO DEL DISEÑO ---
-if 'step' not in st.session_state:
-    st.session_state.step = 'login'
+# --- BASE DE DATOS TEMPORAL (Hoy conectaremos Google Sheets) ---
+if 'db_tramites' not in st.session_state:
+    st.session_state.db_tramites = [
+        {"id": 1, "tipo": "Alta", "placas": "MEX-123-A", "auto": "Nissan Sentra 2020", "aliado": "BIGOTES", "status": "Agendado", "monto": 850},
+        {"id": 2, "tipo": "Cambio Propietario", "placas": "ABC-456-B", "auto": "Toyota Corolla 2019", "aliado": "LIZ", "status": "Recibido", "monto": 1200}
+    ]
 
-if st.session_state.step == 'login':
-    # Crear la tarjeta blanca
-    st.markdown('<div class="login-card">', unsafe_allow_html=True)
-    
-    # Logo y Títulos
-    st.markdown('<div class="logo-text">VANMAR <span class="logo-pro">PRO</span></div>', unsafe_allow_html=True)
-    st.markdown('<div class="welcome-text">Bienvenido a tu gestión vehicular profesional.</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">Regístrate para continuar</div>', unsafe_allow_html=True)
-    
-    # Fila de Iconos alineada
-    st.markdown("""
-        <div class="icon-row">
-            <div class="icon-item"><div class="icon-emoji">🚗</div><div class="icon-text">Trámites</div></div>
-            <div class="icon-item"><div class="icon-emoji">📄</div><div class="icon-text">Documentos</div></div>
-            <div class="icon-item"><div class="icon-emoji">✅</div><div class="icon-text">Control</div></div>
-        </div>
-    """, unsafe_allow_html=True)
+# --- VISTA DE DASHBOARD ---
+st.title("📊 Panel de Control VANMAR PRO")
 
-    # Botón Google (Clase personalizada)
-    st.markdown('<div class="google-btn">', unsafe_allow_html=True)
-    if st.button("Continue with Google 🌐"):
-        st.session_state.step = 'wa_config'
+# 1. FILA DE INDICADORES (KPIs)
+col1, col2, col3, col4, col5 = st.columns(5)
+with col1: st.markdown('<div class="kpi-card"><div class="kpi-value">2</div><div class="kpi-label">RECIBIDOS</div></div>', unsafe_allow_html=True)
+with col2: st.markdown('<div class="kpi-card"><div class="kpi-value">1</div><div class="kpi-label">AGENDADOS</div></div>', unsafe_allow_html=True)
+with col3: st.markdown('<div class="kpi-card" style="border-top-color: #34C759;"><div class="kpi-value">0</div><div class="kpi-label">CONCLUIDOS</div></div>', unsafe_allow_html=True)
+with col4: st.markdown('<div class="kpi-card" style="border-top-color: #FF9500;"><div class="kpi-value">$2,050</div><div class="kpi-label">POR COBRAR</div></div>', unsafe_allow_html=True)
+with col5:
+    if st.button("➕ Nuevo Trámite"):
+        st.session_state.step = 'main' # Regresa al flujo de carga
         st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<p style="color:#86868b; margin:20px 0;">— o —</p>', unsafe_allow_html=True)
+st.write("---")
 
-    # Inputs de Email/Pass
-    email = st.text_input("Email", placeholder="you@example.com", label_visibility="collapsed")
-    password = st.text_input("Password", type="password", placeholder="••••••••", label_visibility="collapsed")
-    
-    st.markdown('<div class="sign-in-btn">', unsafe_allow_html=True)
-    if st.button("Sign in"):
-        if email and password:
-            st.session_state.step = 'wa_config'
-            st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+# 2. BUSCADOR Y LISTA
+search = st.text_input("🔍 Buscar por placas, gestoría o folio...", placeholder="Ej: BIGOTES")
 
-    st.markdown('<p style="font-size:13px; margin-top:20px;"><a href="#" style="color:#007AFF; text-decoration:none;">Forgot password?</a> &nbsp;&nbsp; <a href="#" style="color:#007AFF; text-decoration:none;">Need an account? Sign up</a></p>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True) # Fin de la tarjeta
+st.subheader("Trámites Recientes")
 
-# --- EL RESTO DEL CÓDIGO SE MANTIENE IGUAL PARA EL WHATSAPP ---
-elif st.session_state.step == 'wa_config':
-    st.title("📲 Configura tu WhatsApp")
-    num = st.text_input("Número de 10 dígitos")
-    if st.button("Siguiente"):
-        st.session_state.user_wa = "52" + num
-        st.session_state.step = 'main'
-        st.rerun()
+for t in st.session_state.db_tramites:
+    # Filtro de búsqueda simple
+    if search.lower() in t['aliado'].lower() or search.lower() in t['placas'].lower():
+        color = "#007AFF" if t['status'] == "Agendado" else "#FF3B30"
+        st.markdown(f"""
+            <div class="tramite-card" style="border-left-color: {color}">
+                <div style="display: flex; justify-content: space-between;">
+                    <b>{t['tipo']}</b> <span>${t['monto']}</span>
+                </div>
+                <div style="font-size: 13px; color: #666;">
+                    🚗 {t['placas']} • {t['auto']}<br>
+                    👤 Gestoría: <b>{t['aliado']}</b><br>
+                    📍 Estatus: <span style="color:{color}; font-weight:bold;">{t['status']}</span>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+# 3. NOTA PROACTIVA
+st.info("💡 Consejo VANMAR: Recuerda revisar los expedientes marcados en rojo antes de salir al módulo.")
