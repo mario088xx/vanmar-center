@@ -1,86 +1,106 @@
 import streamlit as st
 
-# --- CONFIGURACIÓN DE SEGURIDAD ---
+# --- CONFIGURACIÓN ---
 CLIENT_ID = "98293623725-oaj0p863lnqkiuhoafv619st5gm57fsk.apps.googleusercontent.com"
 REDIRECT_URI = "https://vanmar-center.streamlit.app"
 
 st.set_page_config(page_title="VANMAR PRO", layout="centered")
 
-# --- ESTILO CRISTAL (SIN NOMBRES EXPUESTOS) ---
+# --- ESTILO ---
 st.markdown("""
     <style>
-    .stApp { background-color: #0e1117; }
     .main-card {
         background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(12px);
         border-radius: 20px;
         padding: 30px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         text-align: center;
         color: white;
     }
-    .google-btn {
-        background-color: white;
-        color: #1f2937;
-        font-weight: bold;
-        text-decoration: none;
-        padding: 15px 25px;
+    .privacy-box {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 15px;
         border-radius: 10px;
-        display: inline-block;
-        width: 100%;
-        margin-top: 20px;
+        text-align: left;
+        font-size: 0.85rem;
+        height: 150px;
+        overflow-y: scroll;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- LÓGICA DE NAVEGACIÓN ---
 if 'paso' not in st.session_state:
-    st.session_state.paso = 'inicio'
+    st.session_state.paso = 'login'
 
-# PANTALLA 1: ACCESO SEGURO
-if st.session_state.paso == 'inicio':
+# --- 1. PANTALLA DE ACCESO ---
+if st.session_state.paso == 'login':
     st.markdown('<div class="main-card">', unsafe_allow_html=True)
-    st.markdown("<h1>VANMAR <span style='color:#4285F4'>PRO</span></h1>", unsafe_allow_html=True)
-    st.write("Bienvenido al Portal de Gestión de Activos.")
-    st.write("---")
+    st.title("VANMAR PRO")
+    st.write("Portal de Gestión y Operaciones")
     
-    # URL REAL DE GOOGLE OAUTH
     login_url = f"https://accounts.google.com/o/oauth2/auth?client_id={CLIENT_ID}&response_type=code&scope=openid%20email%20profile&redirect_uri={REDIRECT_URI}"
+    st.markdown(f'<a href="{login_url}" target="_self" style="background-color: white; color: black; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: block; margin: 20px 0;">Continuar con Google 🌐</a>', unsafe_allow_html=True)
     
-    st.markdown(f'<a href="{login_url}" target="_self" class="google-btn">Continuar con Google 🌐</a>', unsafe_allow_html=True)
-    
-    st.write("O utiliza el acceso para aliados externos")
-    if st.button("Registro Manual / Otros Correos"):
-        st.session_state.paso = 'manual'
+    if st.button("Acceso Manual"):
+        st.session_state.paso = 'privacidad'
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# PANTALLA 2: REGISTRO MANUAL PRIVADO
-elif st.session_state.paso == 'manual':
+# --- 2. CARTA DE PRIVACIDAD (EL RESPALDO) ---
+elif st.session_state.paso == 'privacidad':
     st.markdown('<div class="main-card">', unsafe_allow_html=True)
-    st.subheader("Validación de Identidad")
-    email = st.text_input("Correo electrónico corporativo o personal")
-    password = st.text_input("Contraseña de acceso", type="password")
+    st.subheader("Aviso de Privacidad y Confidencialidad")
     
-    if st.button("Solicitar Acceso"):
-        if "@" in email:
-            st.info("Se ha enviado una solicitud de validación a su correo.")
-            st.session_state.paso = 'finalizado'
+    st.markdown("""
+    <div class="privacy-box">
+        <b>1. Protección de Datos:</b> VANMAR PRO garantiza que la información recolectada (correo y contacto) se utilizará exclusivamente para fines operativos internos.<br><br>
+        <b>2. Confidencialidad:</b> Las identidades de aliados, gestores y personal administrativo están protegidas bajo protocolos de acceso restringido.<br><br>
+        <b>3. No Divulgación:</b> No compartimos bases de datos con terceros. Su número de contacto es utilizado únicamente para validación de identidad y notificaciones críticas del sistema.<br><br>
+        <b>4. Derechos ARCO:</b> El usuario tiene derecho a solicitar la eliminación de sus datos en cualquier momento.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    aceptar = st.checkbox("He leído y acepto los términos de privacidad")
+    
+    if st.button("Continuar"):
+        if aceptar:
+            st.session_state.paso = 'registro'
+            st.rerun()
+        else:
+            st.warning("Debe aceptar los términos para continuar.")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# --- 3. REGISTRO DE CONTACTO ---
+elif st.session_state.paso == 'registro':
+    st.markdown('<div class="main-card">', unsafe_allow_html=True)
+    st.subheader("Vinculación de Perfil")
+    st.write("Ingrese su número de contacto para recibir acceso al centro operativo.")
+    
+    telefono = st.text_input("Número de WhatsApp (10 dígitos)")
+    
+    if st.button("Activar Acceso"):
+        if len(telefono) >= 10:
+            st.session_state.paso = 'final'
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# PANTALLA 3: CONFIRMACIÓN Y FILOSOFÍA
-elif st.session_state.paso == 'finalizado':
+# --- 4. CIERRE CON FILOSOFÍA ---
+elif st.session_state.paso == 'final':
+    st.balloons()
     st.markdown('<div class="main-card">', unsafe_allow_html=True)
-    st.success("### Proceso Iniciado")
-    st.write("Su identidad está siendo verificada por el protocolo de seguridad VANMAR.")
+    st.success("### Acceso Autorizado")
+    st.write("Bienvenido a la red de VANMAR PRO.")
     st.write("---")
     st.markdown("""
-    **Próximos pasos:**
-    1. Recibirá un correo de confirmación.
-    2. Deberá vincular su número de contacto privado.
-    
     ### 🙏 Frase de Vida:
-    "La excelencia es el resultado de cuidar lo que nadie ve, para lograr lo que todos admiran."
+    "La productividad es el acto de dar sentido al tiempo, y la privacidad es el acto de dar valor a las personas."
+    
+    **Tu propósito hoy:**
+    * ⛽ Ejecuta con precisión quirúrgica.
+    * 🎗️ Protege la información de tu equipo.
+    * 🍎 Mantén la visión clara en cada trámite.
+    * **Agradece a Dios por la oportunidad de liderar con orden y respeto.**
     """)
     st.markdown('</div>', unsafe_allow_html=True)
